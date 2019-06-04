@@ -241,6 +241,9 @@ if __name__  == "__main__":
     (vfilepath,vfilename)=os.path.split(args.videofilenamepath)
 
     image = skimage.img_as_float(plt.imread(args.videofilenamepath))
-    plt.imshow(np.abs(gFfft(image))**2)
+    #create noise template
+
+    noise = fftpack.ifft2(fftpack.ifftshift(boxZero(fftpack.fftshift(fftpack.fft2(image)),100)))
+    plt.imshow(np.real(noise))
 
 
