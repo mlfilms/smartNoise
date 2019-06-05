@@ -189,7 +189,7 @@ def autocorr(image):
 def gFfft(image):
     return fftpack.ifftshift(fftpack.fft2(image))
 
-font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",25)
+#font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",25)
 def make_frame(time):
     i = int(time*fps)
     autoim =autocorrImages[i]
@@ -230,9 +230,27 @@ def lorentzFit(x,a,sigma):
 def expFit(x,a,xi):
     return a*exp(-x/xi)
 
+def extractNoise(image):
+    imShape = image.shape
+    r = imShape[0]
+    c = imShape[1]
+
+    if len(imShape) >2:
+        image = image[:,:,1]
+
+    imgF = fftpack.fft2(image)
+    imgFS = fftpack.fftshift(imgF)
+    noiseSF = boxZero(imgFS,100)
+    noiseF = fftpack.ifftshift(noiseSF)
+    noise = fftpack.ifft2(noiseF)
+    return noise
+    
+
+
 dataSize=300
 cropSize = 600
 imageShape = [800,1280]
+
 if __name__  == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("videofilenamepath", help='name of the file to be encoded')
@@ -241,9 +259,14 @@ if __name__  == "__main__":
     (vfilepath,vfilename)=os.path.split(args.videofilenamepath)
 
     image = skimage.img_as_float(plt.imread(args.videofilenamepath))
+    noise = extractNoise(image)
     #create noise template
 
-    noise = fftpack.ifft2(fftpack.ifftshift(boxZero(fftpack.fftshift(fftpack.fft2(image)),100)))
-    plt.imshow(np.real(noise))
 
+
+    #plt.imshow(np.real(imgF))
+    #plt.imshow(np.real(image))
+
+    plt.imshow(np.real(noise))
+    plt.show()
 

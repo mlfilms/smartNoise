@@ -16,6 +16,17 @@ def plot_spectrum(im_fft):
     plt.colorbar()
     plt.title('Fourier transform')
     
+def standardize(image):
+    image = image.astype(np.float64)
+    imgMean = np.mean(image)
+    imgSTD = np.std(image)
+    image= (image - imgMean)/(6*imgSTD)
+    image = image+0.5
+    #image = image*255
+    image = np.clip(image,0,1)
+    return image
+
+
 
 
 class fixer:
@@ -85,18 +96,7 @@ for filename in glob.glob(filePattern):
 
 
     croppedImg = imgcv[y[0]:y[1],x[0]:x[1],:]
-
-    imgMean = np.mean(croppedImg)
-    imgSTD = np.std(croppedImg)
-    print(imgMean)
-    print(imgSTD)
-
-    croppedImg= (croppedImg - imgMean)/(6*imgSTD)
-    croppedImg = croppedImg+0.5
-    croppedImg = croppedImg*255
-    croppedImg = np.clip(croppedImg,1,255)
-    fImg = fftpack.fft2(croppedImg/255)
-    croppedImg = croppedImg.astype(np.uint8)
+    croppedImg = standardize(croppedImg)
 
     plot_spectrum(fImg)
     plt.savefig(outDir+noEnd+'Fourier.'+'jpg')

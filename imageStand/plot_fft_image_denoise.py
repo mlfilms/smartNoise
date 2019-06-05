@@ -23,14 +23,29 @@ Implements, via FFT, the following convolution:
 ############################################################
 import numpy as np
 import matplotlib.pyplot as plt
+import cv2
 
-im = plt.imread('outIMG/r3_1200.bmp').astype(float)
+noisyImg = 'outIMG/r3_1200.bmp'
+cleanImg = '145403_defect1.jpg'
+
+
+im = plt.imread(noisyImg).astype(float)
+imC = plt.imread(cleanImg).astype(float)
+
 imShape = im.shape
 r = imShape[0]
 c = imShape[1]
 
 if len(imShape) >2:
     im = im[:,:,1]
+
+imC = cv2.resize(imC,dsize=(c,r),interpolation = cv2.INTER_CUBIC)
+imCShape = imC.shape
+rC = imCShape[0]
+cC = imCShape[1]
+
+if len(imCShape) >2:
+    imC = imC[:,:,1]
 
 
 plt.figure()
@@ -43,6 +58,7 @@ plt.title('Original image')
 ############################################################
 from scipy import fftpack
 im_fft = fftpack.fft2(im)
+imC_fft = fftpack.fft2(imC)
 
 # Show the results
 
@@ -64,11 +80,13 @@ plt.title('Fourier transform')
 # truncate coefficients.
 
 # Define the fraction of coefficients (in each direction) we keep
-keep_fraction = 0.1
+keep_fraction = 0.2
 
 # Call ff a copy of the original transform. Numpy arrays have a copy
 # method for this purpose.
 im_fft2 = im_fft.copy()
+im_fft2N = im_fft.copy()
+imC_fft2 = imC_fft.copy()
 
 # Set r and c to be the number of rows and columns of the array.
 #r, c = im_fft2.shape
@@ -77,16 +95,32 @@ im_fft2 = im_fft.copy()
 
 # Set to zero all rows with indices between r*keep_fraction and
 # r*(1-keep_fraction):
+im_fft2N[:int(r*keep_fraction)] = 0
+im_fft2N[int(r*(1-keep_fraction)):] =0
+
 im_fft2[int(r*keep_fraction):int(r*(1-keep_fraction))] = 0
 
 # Similarly with the columns:
+#im_fft2N[:,:int(c*keep_fraction)] = 0
+#im_fft2N[:,int(c*(1-keep_fraction)):] = 0
+
 im_fft2[:, int(c*keep_fraction):int(c*(1-keep_fraction))] = 0
+
+imC_fft2 = imC_fft2 + im_fft2N*3
 
 plt.figure()
 plot_spectrum(im_fft2)
 plt.title('Filtered Spectrum')
 
+plt.figure()
+plot_spectrum(im_fft2N)
+plt.title('Noise Spectrum')
 
+plt.figure()
+plot_spectrum(imC_fft2)
+plt.title('Increased Noise Spectrum')
+
+im_fft2 = imC_fft2
 ############################################################
 # Reconstruct the final image
 ############################################################
