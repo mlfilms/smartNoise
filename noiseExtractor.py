@@ -10,6 +10,7 @@ from skimage.transform import AffineTransform, warp
 import cv2
 import glob as glob
 import matplotlib.patches as patches
+import yaml
 
 
 def standardize(image):
@@ -196,7 +197,7 @@ def noiseExtractor(cfg):
 
 if __name__  == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("filepath",nargs='?',type = str, default='noiseSamples', help='name of the file to extract noise from')
+    parser.add_argument("filepath",nargs='?',type = str, default='noiseSamples', help='name of the folder to extract noise from')
     parser.add_argument("setbox",nargs='?',type =str, default="y", help="y to manually set crop size")
     args= parser.parse_args()
 
