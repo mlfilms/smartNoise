@@ -87,16 +87,17 @@ class getter:
                 self.fig.canvas.draw()
 
 def correctImagesCFG(cfg):
-    targetDir = cfg['imageCorrection']['imgFolder']
+    targetDir = os.path.join(cfg['temp']['rootDir'],cfg['imageCorrection']['imgFolder'])
     ext = cfg['imageCorrection']['imgExt']
     outDir = os.path.join(targetDir,"corrected")
     fullImg = 1
-    print(outDir)
+    
     if not os.path.exists(outDir):
         os.makedirs(outDir)
 
     filePattern = 	os.path.join(targetDir,"*." + ext)
     first = 1  
+    print(filePattern)
     for filename in glob.glob(filePattern):
         
         images = ImageSequence(filename)
@@ -131,6 +132,9 @@ def correctImagesCFG(cfg):
                 for i in range(0,len(y)):
                     y[i] = int(y[i])
                 first = 0
+        elif cfg['imageCorrection']['autoBox']:
+            x = cfg['imageCorrection']['cropX']
+            y = cfg['imageCorrection']['cropY']
         else:
             dims = imgcv.shape
             x = [0,dims[0]]
