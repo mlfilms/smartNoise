@@ -19,21 +19,21 @@ def plot_spectrum(im_fft):
     plt.colorbar()
     plt.title('Fourier transform')
     
-def standardize(image):
+def standardize(image,stds):
     image = image.astype(np.float64)
     imgMean = np.mean(image)
     imgSTD = np.std(image)
-    image= (image - imgMean)/(6*imgSTD)
+    image= (image - imgMean)/(stds*imgSTD)
     image = image+0.5
     #image = image*255
     image = np.clip(image,0,1)
     return image
-def standardizeCropped(image,croppedImg):
+def standardizeCropped(image,croppedImg,stds):
     image = image.astype(np.float64)
     croppedImg = croppedImg.astype(np.float64)
     imgMean = np.mean(croppedImg)
     imgSTD = np.std(croppedImg)
-    image= (image - imgMean)/(6*imgSTD)
+    image= (image - imgMean)/(stds*imgSTD)
     image = image+0.5
     #image = image*255
     image = np.clip(image,0,1)
@@ -138,8 +138,8 @@ def correctImagesCFG(cfg):
 
 
         croppedImg = imgcv[y[0]:y[1],x[0]:x[1]]
-
-        outImg = standardizeCropped(imgcv,croppedImg)
+        stds = cfg['standard']['stds']
+        outImg = standardizeCropped(imgcv,croppedImg,stds)
         outImg = outImg*256
         outImg = outImg.astype(np.uint8)
 
